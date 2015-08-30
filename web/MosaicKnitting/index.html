@@ -1,0 +1,255 @@
+<html>
+<head>
+	<title>Mosaic Knitting Pattern Generator</title>
+</head>
+<body>
+
+<div id="header">
+<h1>Mosaic Knitting Pattern Generator</h1>
+
+<p>
+This is a script to generate patterns intended to be knit using the two-color knitting technique known as "mosaic", or "slip-stitch", knitting. If you make something using this pattern generator, I'd love to know about it!  You can email me (me[at]laurakogler.net), or hit me up on <a href="http://www.ravelry.com/people/laurak6">ravelry</a>!</p>
+
+<p> Note: In order to use this script, you need a canvas-enabled browser (sorry, no Internet Explorer). </p>
+
+</div>
+
+<div id="menu" style="width:300px;float:left;text-align:left">
+
+<script src="../processing-1.0.0.min.js"></script>
+<script type="text/javascript" src="jscolor/jscolor.js"></script>
+<script src="base64.js" type="text/javascript"></script> 
+<script src="canvas2image.js" type="text/javascript"></script> 
+
+<form name="form">
+<b> Options: </b>
+<em>(hit "Update" button below to update image)</em><br />
+<input type="checkbox" name="flipXBox" value="FlipX" /> Reflect pattern in X<br />
+<input type="checkbox" name="flipYBox" value="FlipY" /> Reflect pattern in Y<br />
+<input type="checkbox" name="mutateBox" value="Mutate" /> Mutate pattern (change one stitch for each vertical reptition) <br />
+<input type="checkbox" name="dissolveBox" value="Dissolve" /> Dissolve pattern (gradually turn pattern into horizontal stripes) <br /> 
+
+<p><b> Number of stitches in pattern unit: </b></p>
+<p> Width
+<select name="unitWidthMenu">
+<option value="4"> 4</option>
+<option value="6"> 6</option>
+<option value="8" selected="selected"> 8</option>
+<option value="10"> 10</option>
+<option value="12"> 12</option>
+<option value="14"> 14</option>
+<option value="16"> 16</option>
+<option value="18"> 18</option>
+<option value="20"> 20</option>
+</select>
+Height 
+<select name="unitHeightMenu">
+<option value="4"> 4</option>
+<option value="6"> 6</option>
+<option value="8" selected="selected"> 8</option>
+<option value="10"> 10</option>
+<option value="12"> 12</option>
+<option value="14"> 14</option>
+<option value="16"> 16</option>
+<option value="18"> 18</option>
+<option value="20"> 20</option>
+</select></p>
+
+<p><b> Number of pattern repetitions: </b></p>
+<p> X
+<select name="repsXMenu">
+<option value="1"> 1</option>
+<option value="2" selected="selected"> 2</option>
+<option value="3"> 3</option>
+<option value="4"> 4</option>
+<option value="5"> 5</option>
+<option value="6"> 6</option>
+<option value="7"> 7</option>
+<option value="8"> 8</option>
+<option value="9"> 9</option>
+<option value="10"> 10</option>
+<option value="11"> 11</option>
+<option value="12"> 12</option>
+<option value="13"> 13</option>
+<option value="14"> 14</option>
+<option value="15"> 15</option>
+<option value="16"> 16</option>
+<option value="17"> 17</option>
+<option value="18"> 18</option>
+<option value="19"> 19</option>
+<option value="20"> 20</option>
+</select>
+Y 
+<select name="repsYMenu">
+<option value="1"> 1</option>
+<option value="2"> 2</option>
+<option value="3"> 3</option>
+<option value="4"> 4</option>
+<option value="5"> 5</option>
+<option value="6"> 6</option>
+<option value="7"> 7</option>
+<option value="8" selected="selected"> 8</option>
+<option value="9"> 9</option>
+<option value="10"> 10</option>
+<option value="11"> 11</option>
+<option value="12"> 12</option>
+<option value="13"> 13</option>
+<option value="14"> 14</option>
+<option value="15"> 15</option>
+<option value="16"> 16</option>
+<option value="17"> 17</option>
+<option value="18"> 18</option>
+<option value="19"> 19</option>
+<option value="20"> 20</option>
+</select></p>
+
+<p><b> Stitch size: </b> (pixels)
+<select name="stitchSizeMenu">
+<option value="1"> 1</option>
+<option value="2"> 2x2</option>
+<option value="3"> 3x3</option>
+<option value="4"> 4x4</option>
+<option value="5" selected="selected"> 5x5</option>
+<option value="6"> 6x6</option>
+<option value="7"> 7x7</option>
+<option value="8"> 8x8</option>
+<option value="9"> 9x9</option>
+<option value="10"> 10x10</option>
+</select> </p>
+
+<p><b> Colors: </b></p>
+<p> Color A <input class="color" id="colorA" value="FF0000">
+<p> Color B <input class="color" id="colorB" value="FFFFFF">
+
+<p>
+<input type="button" name="run" value="Update" onClick="updateParameters(this.form)">
+
+<input type="button" name="newSeedButton" value="New Pattern Unit" onClick="updateRandomSeed(this.form)">
+</p>
+</form>
+</div>
+<div id="pattern" style="background-color;float:center;">
+<canvas id="sketch" data-processing-sources="MosaicKnitting.pde"></canvas><br />
+<p>
+<div id="buttonContainer" style="float:center">
+<input type="button" name="saveButton" value="Save Image as .png" onClick="saveImage()">
+</p>
+</div>
+<div id="textdownload" style="display:none;font-style:italic;float:center">Now you can right click and download the image<br/> 
+<input type="button" id="resetButton" value="Reset" onClick="resetCanvas()"> 
+</div> 
+
+</div>
+
+<div id="footer" style="clear:both">
+<p>Made using <a href="http://processingjs.org/">processing.js</a>.</p>
+</div>
+
+<script type="application/javascript">
+var unitWidth = Number(form.unitWidthMenu.value);
+var unitHeight = Number(form.unitHeightMenu.value);
+var repsX = Number(form.repsXMenu.value);
+var repsY = Number(form.repsYMenu.value);
+var stitchSize = Number(form.stitchSizeMenu.value);
+var flipX=form.flipXBox.checked;
+var flipY=form.flipYBox.checked;
+var mutate=form.mutateBox.checked;
+var dissolve=form.dissolveBox.checked;
+var seed=Math.floor(Math.random()*2147483647);
+// var hueA = form.colorA.color.hsv[0]* 60;
+// var satA = form.colorA.color.hsv[1]*100;
+// var briA = form.colorA.color.hsv[2]*100;
+// var hueB = 0;
+// var satB = 0;
+// var briB = 0;
+var hueA = 0;
+var satA = 100;
+var briA = 100;
+var hueB = 0;
+var satB = 0;
+var briB = 100;
+
+var canvas;
+
+
+function updateParameters(form)
+{
+	unitWidth = Number(form.unitWidthMenu.value);
+	unitHeight = Number(form.unitHeightMenu.value);
+	repsX = Number(form.repsXMenu.value);
+	repsY = Number(form.repsYMenu.value);
+	stitchSize = Number(form.stitchSizeMenu.value);
+	flipX = form.flipXBox.checked;
+	flipY = form.flipYBox.checked;
+	mutate = form.mutateBox.checked;
+	dissolve = form.dissolveBox.checked;
+	
+	hueA = form.colorA.color.hsv[0]* 60;
+	satA = form.colorA.color.hsv[1]*100;
+	briA = form.colorA.color.hsv[2]*100;
+	
+	hueB = form.colorB.color.hsv[0]* 60;
+	satB = form.colorB.color.hsv[1]*100;
+	briB = form.colorB.color.hsv[2]*100;
+	
+	var processingInstance = Processing.getInstanceById('sketch');  
+	processingInstance.setup();
+	
+}
+
+function updateRandomSeed(form)
+{
+	seed = Math.floor(Math.random()*2147483647);
+	updateParameters(form);
+}
+
+function saveImage()
+{
+	canvas = document.getElementById("sketch");
+	var img = Canvas2Image.saveAsPNG(canvas, true);
+	
+	img.id = "canvasimage";
+	
+	img.style.border = "solid 1px";
+	canvas.parentNode.replaceChild(img, canvas);
+	
+	showDownloadText();
+}
+
+function resetCanvas()
+{
+	var img = document.getElementById("canvasimage");
+	img.parentNode.replaceChild(canvas, img);
+	
+	hideDownloadText();
+}
+
+function showDownloadText() {
+	document.getElementById("buttonContainer").style.display = "none";
+	document.getElementById("textdownload").style.display = "block";
+}
+
+function hideDownloadText() {
+	document.getElementById("buttonContainer").style.display = "block";
+	document.getElementById("textdownload").style.display = "none";
+}
+
+</script>
+
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-36421223-1']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+</body>
+</html>
